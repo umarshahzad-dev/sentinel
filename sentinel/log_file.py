@@ -1,14 +1,16 @@
-from log_entry import LogEntry
 from pathlib import Path
+from typing import List, Dict
+
+from .log_entry import LogEntry
 
 
 class LogFile:
     """Represents a single log file with its entries."""
 
-    def __init__(self, file_path: Path):
+    def __init__(self, file_path: Path) -> None:
         """Initialize by reading and parsing the log file."""
-        self._file_path = file_path
-        self._entries = []
+        self._file_path: Path = file_path
+        self._entries: List[LogEntry] = []
 
         try:
             with open(self._file_path, "r", encoding="utf-8") as f:
@@ -25,35 +27,36 @@ class LogFile:
             print(f"Unexpected error on {self._file_path.name}: {e}")
 
     @property
-    def entries(self):
+    def entries(self) -> List[LogEntry]:
         """Return all log entries."""
         return self._entries
 
-    def get_entries_by_level(self, level: str):
-        """Return entries that match a specific level (ERROR, WARNING, INFO)."""
-        level_list = []
-        for entry in self._entries:
-            if entry.level == level:
-                level_list.append(entry)
-        return level_list
-
-    def count_by_level(self):
-        """Return a dictionary with counts for each level."""
-        level_count_dict = {}
-        for entry in self._entries:
-            if entry.level in level_count_dict:
-                level_count_dict[entry.level] += 1
-            else:
-                level_count_dict[entry.level] = 1
-        return level_count_dict
-
     @property
-    def total_lines(self):
+    def total_lines(self) -> int:
         """Return the total number of lines in the file."""
         return len(self._entries)
 
-    def __repr__(self):
-        return f"LogFile(path='{self._file_path}', entries={len(self._entries)})"
+    def get_entries_by_level(self, level: str) -> List[LogEntry]:
+        """Return entries that match a specific level (ERROR, WARNING, INFO)."""
+        result: List[LogEntry] = []
+        for entry in self._entries:
+            if entry.level == level:
+                result.append(entry)
+        return result
+
+    def count_by_level(self) -> Dict[str, int]:
+        """Return a dictionary with counts for each log level."""
+        counts: Dict[str, int] = {}
+        for entry in self._entries:
+            if entry.level in counts:
+                counts[entry.level] += 1
+            else:
+                counts[entry.level] = 1
+        return counts
+
+    def __repr__(self) -> str:
+        """Return a string representation for debugging."""
+        return f"LogFile(path='{self._file_path}', entries={self.total_lines})"
 
 
 if __name__ == "__main__":
