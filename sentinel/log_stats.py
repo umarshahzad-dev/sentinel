@@ -18,18 +18,22 @@ class LogStats:
 
     def _build_stats(self) -> None:
         """Build all statistics from entries."""
+        # Count entries by level using defaultdict
         self._level_counts = defaultdict(int)
         for entry in self._entries:
             self._level_counts[entry.level] += 1
 
+        # Unique messages for EACH level
         self._unique_messages = defaultdict(set)
         for entry in self._entries:
             self._unique_messages[entry.level].add(entry.message)
 
+        # Frequency of messages for EACH level
         self._message_frequency = defaultdict(Counter)
         for entry in self._entries:
             self._message_frequency[entry.level][entry.message] += 1
 
+        # Recent entries (last 20)
         self._recent_entries = self._entries[-20:]
 
     @property
@@ -48,6 +52,7 @@ class LogStats:
         """
         if level:
             return set(self._unique_messages.get(level, []))
+        # Combine all levels
         combined = set()
         for messages in self._unique_messages.values():
             combined.update(messages)
@@ -67,6 +72,7 @@ class LogStats:
         """
         if level:
             return self._message_frequency.get(level, Counter()).most_common(n)
+        # Combine all levels
         combined = Counter()
         for counter in self._message_frequency.values():
             combined.update(counter)
